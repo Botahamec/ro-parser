@@ -160,6 +160,33 @@ fn remove_block_comments(tokens: TokenList) -> TokenList {
 	new_list
 }
 
+fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
+
+	let mut funcs = Vec::new();
+
+	let mut token = 0;
+	while token < tokens.len() {
+		if tokens[token] == String::from("fn") {
+
+			let mut prototype = TokenList::new();
+			while tokens[token] != String::from("{") {
+				token += 1;
+				prototype.push(tokens[token].clone());
+			}
+
+			let mut code = TokenList::new();
+			while tokens[token] != String::from("}") {
+				token += 1;
+				code.push(tokens[token].clone());
+			}
+
+			funcs.push(FuncParser {prototype, code})
+		}
+	}
+
+	funcs
+}
+
 fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 	let mut program_parser = ProgramParser::default();
 
@@ -180,6 +207,24 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 			}
 
 			program_parser.functions.push(FuncParser{prototype, code});
+		}
+
+		if tokens[token] == String::from("result") {
+
+			let mut prototype = TokenList::new();
+			while tokens[token] != String::from("{") {
+				token += 1;
+				prototype.push(tokens[token].clone());
+			}
+
+			let mut code = TokenList::new();
+			while tokens[token] != String::from("}") {
+				token += 1;
+				code.push(tokens[token].clone());
+			}
+
+			let functions = parse_for_fns(code);
+			program_parser.results.push(ResultParser{prototype, functions});
 		}
 	}
 	program_parser
