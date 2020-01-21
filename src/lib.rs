@@ -8,7 +8,7 @@ mod tests;
 use std::iter::FromIterator;
 use std::collections::LinkedList;
 
-use ro_backend::{Program, Function, Parameter};
+use ro_backend::{Program, Function, Parameter, RoResult};
 
 type TokenList = Vec<String>;
 
@@ -46,6 +46,24 @@ impl LexStack {
 	}
 }
 
+#[derive(Default)]
+struct ProgramParser {
+	results: Vec<ResultParser>,
+	functions: Vec<FuncParser>
+}
+
+#[derive(Default)]
+struct FuncParser {
+	prototype: TokenList,
+	code: TokenList
+}
+
+#[derive(Default)]
+struct ResultParser {
+	prototype: TokenList,
+	functions: Vec<FuncParser>
+}
+
 // a list of valid operators
 const OPERATORS : [&str; 17] = ["(", ":", ",", ".", ")", "{", "}", ">", "=", "+", "-", "*", "/", "=>", "//", "/*", "*/"];
 
@@ -55,6 +73,12 @@ const KEYWORDS : [&str; 4] = ["fn", "result", "var", "return"];
 // a list of characters which are considered whitespace
 const WHITESPACE : [char; 4] = [' ', '\n', '\t', '\r'];
 
+/**
+ * Converts Ro code into a list of tokens
+ *
+ * @author	Mike White
+ * @param	code the code as a String
+ */
 fn tokenize(code: String) -> TokenList {
 
 	let mut tokens = TokenList::new(); // what will be returned
@@ -134,6 +158,31 @@ fn remove_block_comments(tokens: TokenList) -> TokenList {
 	}
 
 	new_list
+}
+
+fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
+	let mut program_parser = ProgramParser::default();
+
+	let mut token = 0;
+	while token < tokens.len() {
+		if tokens[token] == String::from("fn") {
+
+			let mut prototype = TokenList::new();
+			while tokens[token] != String::from("{") {
+				token += 1;
+				prototype.push(tokens[token].clone());
+			}
+
+			let mut code = TokenList::new();
+			while tokens[token] != String::from("}") {
+				token += 1;
+				code.push(tokens[token].clone());
+			}
+
+			program_parser.functions.push(FuncParser{prototype, code});
+		}
+	}
+	program_parser
 }
 
 // TODO: remove unwraps
