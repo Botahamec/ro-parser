@@ -52,7 +52,7 @@ struct ProgramParser {
 	functions: Vec<FuncParser>
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 struct FuncParser {
 	prototype: TokenList,
 	code: TokenList
@@ -169,22 +169,26 @@ fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
 		if tokens[token] == String::from("fn") {
 
 			let mut prototype = TokenList::new();
+			token += 1;
 			while tokens[token] != String::from("{") {
-				token += 1;
 				prototype.push(tokens[token].clone());
+				token += 1;
 			}
 
 			let mut code = TokenList::new();
-			let mut brackets = 1; // the number of brackets that need to be closed
-			while brackets != 0 {
+			let mut brackets : usize = 1; // the number of brackets that need to be closed
+			loop {
+				token += 1;
+				println!("{} {}", tokens[token], brackets);
 				if tokens[token] == String::from("{") {brackets += 1;}
 				if tokens[token] == String::from("}") {brackets -= 1;}
-				token += 1;
+				if brackets == 0 {break;}
 				code.push(tokens[token].clone());
 			}
 
 			funcs.push(FuncParser {prototype, code})
 		}
+		token += 1;
 	}
 
 	funcs

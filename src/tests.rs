@@ -32,6 +32,7 @@ fn tokenize_test() {
 #[test]
 fn code_block_test() {
 
+	// closure to shorten certain code
 	let test = |code| remove_block_comments(tokenize(code));
 
 	let mut code = String::from("fn main() {\n\t/* comment */\n\tprint(add(1, 2).to_string())\n}");
@@ -53,4 +54,15 @@ fn code_block_test() {
 	code = String::from("fn {\n\t /* a comment that has been toggled on\n\treturn one + two\n\t*/\n}");
 	tokens = vec!["fn", "{", "}"];
 	assert_eq!(test(code), tokens);
+}
+
+#[test]
+fn parse_fns_test() {
+
+	let string_vec = ||
+
+	let mut tokens : TokenList = vec!["fn", "main", "(", ")", "{", "println", "(", ")", "}"].iter().map(|s| String::from(*s)).collect();
+	let mut prototype : TokenList = vec!["main", "(", ")"].iter().map(|s| String::from(*s)).collect();
+	let mut code : TokenList = vec!["println", "(", ")",].iter().map(|s| String::from(*s)).collect();
+	assert_eq!(parse_for_fns(tokens)[0], FuncParser{prototype, code});
 }
