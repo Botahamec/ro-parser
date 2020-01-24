@@ -175,7 +175,10 @@ fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
 			}
 
 			let mut code = TokenList::new();
-			while tokens[token] != String::from("}") {
+			let mut brackets = 1; // the number of brackets that need to be closed
+			while brackets != 0 {
+				if tokens[token] == String::from("{") {brackets += 1;}
+				if tokens[token] == String::from("}") {brackets -= 1;}
 				token += 1;
 				code.push(tokens[token].clone());
 			}
