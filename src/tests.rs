@@ -32,23 +32,25 @@ fn tokenize_test() {
 #[test]
 fn code_block_test() {
 
+	let test = |code| remove_block_comments(tokenize(code));
+
 	let mut code = String::from("fn main() {\n\t/* comment */\n\tprint(add(1, 2).to_string())\n}");
 	let mut tokens = vec!["fn", "main", "(", ")", "{", "print", "(", "add", "(", "1", ",", "2", ")", ".", "to_string", "(", ")", ")", "}"];
-	assert_eq!(remove_block_comments(tokenize(code)), tokens);
+	assert_eq!(test(code), tokens);
 
 	code = String::from("result sort(list /*:*/ float): float");
 	tokens = vec!["result", "sort", "(", "list", "float", ")", ":", "float"];
-	assert_eq!(remove_block_comments(tokenize(code)), tokens);
+	assert_eq!(test(code), tokens);
 
 	code = String::from("fn addtwo (one:floa/*t*/, two: float): float {\n\treturn one+two\n}");
 	tokens = vec!["fn", "addtwo", "(", "one", ":", "floa", ",", "two", ":", "float", ")", ":", "float", "{", "return", "one", "+", "two", "}"];
-	assert_eq!(remove_block_comments(tokenize(code)), tokens);
+	assert_eq!(test(code), tokens);
 
 	code = String::from("fn {\n\t //* a comment that has been toggled off\n\treturn one + two\n\t*/\n}");
 	tokens = vec!["fn", "{", "return", "one", "+", "two", "}"];
-	assert_eq!(remove_block_comments(tokenize(code)), tokens);
+	assert_eq!(test(code), tokens);
 
 	code = String::from("fn {\n\t /* a comment that has been toggled on\n\treturn one + two\n\t*/\n}");
 	tokens = vec!["fn", "{", "}"];
-	assert_eq!(remove_block_comments(tokenize(code)), tokens);
+	assert_eq!(test(code), tokens);
 }
