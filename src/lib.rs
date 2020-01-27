@@ -179,7 +179,6 @@ fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
 			let mut brackets : usize = 1; // the number of brackets that need to be closed
 			loop {
 				token += 1;
-				println!("{} {}", tokens[token], brackets);
 				if tokens[token] == String::from("{") {brackets += 1;}
 				if tokens[token] == String::from("}") {brackets -= 1;}
 				if brackets == 0 {break;}

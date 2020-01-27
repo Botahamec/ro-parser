@@ -59,10 +59,28 @@ fn code_block_test() {
 #[test]
 fn parse_fns_test() {
 
-	let string_vec = ||
+	let string_vec = |vec: Vec<&str>| -> Vec<String> {vec.iter().map(|s| String::from(*s)).collect()};
 
-	let mut tokens : TokenList = vec!["fn", "main", "(", ")", "{", "println", "(", ")", "}"].iter().map(|s| String::from(*s)).collect();
-	let mut prototype : TokenList = vec!["main", "(", ")"].iter().map(|s| String::from(*s)).collect();
-	let mut code : TokenList = vec!["println", "(", ")",].iter().map(|s| String::from(*s)).collect();
+	let mut tokens = string_vec(vec!["fn", "main", "(", ")", "{", "println", "(", ")", "}"]);
+	let mut prototype = string_vec(vec!["main", "(", ")"]);
+	let mut code = string_vec(vec!["println", "(", ")"]);
 	assert_eq!(parse_for_fns(tokens)[0], FuncParser{prototype, code});
+
+	tokens = string_vec(vec!["fn", "temp_convert", "(", "farenheit", ":", "isize", ")", "{", "var", "temp1", "=", "farenheit", "-", "32", "var", "temp2", "=", "temp1", "*", "5", "var", "temp3", "=", "temp2", "/", "9", "return", "temp3", "}"]);
+	prototype = string_vec(vec!["temp_convert", "(", "farenheit", ":", "isize", ")"]);
+	code = string_vec(vec!["var", "temp1", "=", "farenheit", "-", "32", "var", "temp2", "=", "temp1", "*", "5", "var", "temp3", "=", "temp2", "/", "9", "return", "temp3"]);
+	assert_eq!(parse_for_fns(tokens)[0], FuncParser{prototype, code});
+
+	tokens = string_vec(vec!["fn", "main", "(", ")", "{", "println", "(", ")", "}", "fn", "temp_convert", "(", "farenheit", ":", "isize", ")", "{", "var", "temp1", "=", "farenheit", "-", "32", "var", "temp2", "=", "temp1", "*", "5", "var", "temp3", "=", "temp2", "/", "9", "return", "temp3", "}"]);
+	let fns = parse_for_fns(tokens);
+	assert_eq!(fns.len(), 2);
+
+	prototype = string_vec(vec!["main", "(", ")"]);
+	code = string_vec(vec!["println", "(", ")"]);
+	assert_eq!(fns[0], FuncParser{prototype, code});
+
+	prototype = string_vec(vec!["temp_convert", "(", "farenheit", ":", "isize", ")"]);
+	code = string_vec(vec!["var", "temp1", "=", "farenheit", "-", "32", "var", "temp2", "=", "temp1", "*", "5", "var", "temp3", "=", "temp2", "/", "9", "return", "temp3"]);
+	assert_eq!(fns[1], FuncParser{prototype, code});
+
 }
