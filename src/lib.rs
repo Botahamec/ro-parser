@@ -54,13 +54,13 @@ struct ProgramParser {
 
 #[derive(Default, Debug, PartialEq)]
 struct FuncParser {
-	prototype: TokenList,
+	signature: TokenList,
 	code: TokenList
 }
 
 #[derive(Default)]
 struct ResultParser {
-	prototype: TokenList,
+	signature: TokenList,
 	functions: Vec<FuncParser>
 }
 
@@ -168,10 +168,10 @@ fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
 	while token < tokens.len() {
 		if tokens[token] == String::from("fn") {
 
-			let mut prototype = TokenList::new();
+			let mut signature = TokenList::new();
 			token += 1;
 			while tokens[token] != String::from("{") {
-				prototype.push(tokens[token].clone());
+				signature.push(tokens[token].clone());
 				token += 1;
 			}
 
@@ -185,7 +185,7 @@ fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
 				code.push(tokens[token].clone());
 			}
 
-			funcs.push(FuncParser {prototype, code})
+			funcs.push(FuncParser {signature, code})
 		}
 		token += 1;
 	}
@@ -200,10 +200,10 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 	while token < tokens.len() {
 		if tokens[token] == String::from("fn") {
 
-			let mut prototype = TokenList::new();
+			let mut signature = TokenList::new();
 			while tokens[token] != String::from("{") {
 				token += 1;
-				prototype.push(tokens[token].clone());
+				signature.push(tokens[token].clone());
 			}
 
 			let mut code = TokenList::new();
@@ -212,15 +212,15 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 				code.push(tokens[token].clone());
 			}
 
-			program_parser.functions.push(FuncParser{prototype, code});
+			program_parser.functions.push(FuncParser{signature, code});
 		}
 
 		if tokens[token] == String::from("result") {
 
-			let mut prototype = TokenList::new();
+			let mut signature = TokenList::new();
 			while tokens[token] != String::from("{") {
 				token += 1;
-				prototype.push(tokens[token].clone());
+				signature.push(tokens[token].clone());
 			}
 
 			let mut code = TokenList::new();
@@ -230,7 +230,7 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 			}
 
 			let functions = parse_for_fns(code);
-			program_parser.results.push(ResultParser{prototype, functions});
+			program_parser.results.push(ResultParser{signature, functions});
 		}
 	}
 	program_parser
