@@ -2,14 +2,14 @@
 use crate::TokenList;
 
 #[derive(Default, Debug, PartialEq)]
-struct FuncParser {
-	signature: TokenList,
-	code: TokenList
+pub struct FuncParser {
+	pub signature: TokenList,
+	pub code: TokenList
 }
 
 impl FuncParser {
 
-	fn vec_from_tokens(tokens: TokenList) -> Vec<FuncParser> {
+	pub fn vec_from_tokens(tokens: TokenList) -> Vec<FuncParser> {
 		let mut funcs = Vec::new();
 
 		let mut token = 0;
@@ -41,7 +41,7 @@ impl FuncParser {
 		funcs
 	}
 
-	fn vec_from_string(code: String) -> Vec<FuncParser> {
+	pub fn vec_from_string(code: String) -> Vec<FuncParser> {
 		let tokens = crate::tokenizer::tokenize(code);
 		Self::vec_from_tokens(tokens)
 	}

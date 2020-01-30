@@ -12,7 +12,8 @@ use std::collections::LinkedList;
 
 //use ro_backend::{Program, Function, Parameter};
 
-use tokenizer::{TokenList};
+use tokenizer::TokenList;
+use function::FuncParser;
 
 #[derive(PartialEq, Clone)]
 enum LexMode {
@@ -45,49 +46,10 @@ struct ProgramParser {
 	functions: Vec<FuncParser>
 }
 
-#[derive(Default, Debug, PartialEq)]
-struct FuncParser {
-	signature: TokenList,
-	code: TokenList
-}
-
 #[derive(Default)]
 struct ResultParser {
 	signature: TokenList,
 	functions: Vec<FuncParser>
-}
-
-fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
-
-	let mut funcs = Vec::new();
-
-	let mut token = 0;
-	while token < tokens.len() {
-		if tokens[token] == "fn" {
-
-			let mut signature = TokenList::new();
-			token += 1;
-			while tokens[token] != "{" {
-				signature.push(tokens[token].clone());
-				token += 1;
-			}
-
-			let mut code = TokenList::new();
-			let mut brackets : usize = 1; // the number of brackets that need to be closed
-			loop {
-				token += 1;
-				if tokens[token] == "{" {brackets += 1;}
-				if tokens[token] == "}" {brackets -= 1;}
-				if brackets == 0 {break;}
-				code.push(tokens[token].clone());
-			}
-
-			funcs.push(FuncParser {signature, code})
-		}
-		token += 1;
-	}
-
-	funcs
 }
 
 fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
@@ -136,7 +98,7 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 				code.push(tokens[token].clone());
 			}
 
-			let functions = parse_for_fns(code);
+			let functions = FuncParser::vec_from_tokens(code);
 			program_parser.results.push(ResultParser{signature, functions});
 		}
 	}

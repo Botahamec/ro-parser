@@ -1,6 +1,7 @@
 
 use crate::*;
 use tokenizer::*;
+use function::*;
 
 #[test]
 fn tokenize_test() {
@@ -69,22 +70,23 @@ fn code_block_test() {
 fn parse_fns_test() {
 
 	let string_vec = |vec: Vec<&str>| -> Vec<String> {vec.iter().map(|s| String::from(*s)).collect()};
+	let parse = |tokens: TokenList| -> Vec<FuncParser> {FuncParser::vec_from_tokens(tokens)};
 
 	// a simple function
 	let mut tokens = string_vec(vec!["fn", "main", "(", ")", "{", "println", "(", ")", "}"]);
 	let mut signature = string_vec(vec!["main", "(", ")"]);
 	let mut code = string_vec(vec!["println", "(", ")"]);
-	assert_eq!(parse_for_fns(tokens)[0], FuncParser{signature, code});
+	assert_eq!(parse(tokens)[0], FuncParser{signature, code});
 
 	// a compilcated function
 	tokens = string_vec(vec!["fn", "temp_convert", "(", "farenheit", ":", "isize", ")", "{", "var", "temp1", "=", "farenheit", "-", "32", "var", "temp2", "=", "temp1", "*", "5", "var", "temp3", "=", "temp2", "/", "9", "return", "temp3", "}"]);
 	signature = string_vec(vec!["temp_convert", "(", "farenheit", ":", "isize", ")"]);
 	code = string_vec(vec!["var", "temp1", "=", "farenheit", "-", "32", "var", "temp2", "=", "temp1", "*", "5", "var", "temp3", "=", "temp2", "/", "9", "return", "temp3"]);
-	assert_eq!(parse_for_fns(tokens)[0], FuncParser{signature, code});
+	assert_eq!(parse(tokens)[0], FuncParser{signature, code});
 
 	// multiple functions
 	tokens = string_vec(vec!["fn", "main", "(", ")", "{", "println", "(", ")", "}", "fn", "temp_convert", "(", "farenheit", ":", "isize", ")", "{", "var", "temp1", "=", "farenheit", "-", "32", "var", "temp2", "=", "temp1", "*", "5", "var", "temp3", "=", "temp2", "/", "9", "return", "temp3", "}"]);
-	let fns = parse_for_fns(tokens);
+	let fns = parse(tokens);
 	assert_eq!(fns.len(), 2);
 
 	signature = string_vec(vec!["main", "(", ")"]);
