@@ -201,31 +201,41 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 		if tokens[token] == String::from("fn") {
 
 			let mut signature = TokenList::new();
+			token += 1;
 			while tokens[token] != String::from("{") {
-				token += 1;
 				signature.push(tokens[token].clone());
+				token += 1;
 			}
 
 			let mut code = TokenList::new();
-			while tokens[token] != String::from("}") {
+			let mut brackets : usize = 1; // the number of brackets that need to be closed
+			loop {
 				token += 1;
+				if tokens[token] == String::from("{") {brackets += 1;}
+				if tokens[token] == String::from("}") {brackets -= 1;}
+				if brackets == 0 {break;}
 				code.push(tokens[token].clone());
 			}
 
-			program_parser.functions.push(FuncParser{signature, code});
+			program_parser.functions.push(FuncParser {signature, code})
 		}
 
 		if tokens[token] == String::from("result") {
 
 			let mut signature = TokenList::new();
+			token += 1;
 			while tokens[token] != String::from("{") {
-				token += 1;
 				signature.push(tokens[token].clone());
+				token += 1;
 			}
 
 			let mut code = TokenList::new();
-			while tokens[token] != String::from("}") {
+			let mut brackets : usize = 1; // the number of brackets that need to be closed
+			loop {
 				token += 1;
+				if tokens[token] == String::from("{") {brackets += 1;}
+				if tokens[token] == String::from("}") {brackets -= 1;}
+				if brackets == 0 {break;}
 				code.push(tokens[token].clone());
 			}
 
