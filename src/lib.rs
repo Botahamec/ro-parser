@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 
 extern crate ro_backend;
 
@@ -16,43 +15,43 @@ use tokenizer::TokenList;
 use function::FuncParser;
 
 #[derive(PartialEq, Clone)]
-enum LexMode {
+pub enum LexMode {
 	Function,
 	Result
 }
 
 #[derive(Default, PartialEq, Clone)]
-struct LexStack {
+pub struct LexStack {
 	array: LinkedList<LexMode>
 }
 
 impl LexStack {
-	fn top(self) -> LexMode {
+	pub fn top(self) -> LexMode {
 		self.array.front().unwrap().clone()
 	}
 
-	fn push(&mut self, mode: LexMode) {
+	pub fn push(&mut self, mode: LexMode) {
 		self.array.push_front(mode);
 	}
 
-	fn pop(&mut self) -> LexMode {
+	pub fn pop(&mut self) -> LexMode {
 		self.array.pop_front().unwrap()
 	}
 }
 
 #[derive(Default)]
-struct ProgramParser {
-	results: Vec<ResultParser>,
-	functions: Vec<FuncParser>
+pub struct ProgramParser {
+	pub results: Vec<ResultParser>,
+	pub functions: Vec<FuncParser>
 }
 
 #[derive(Default)]
-struct ResultParser {
-	signature: TokenList,
-	functions: Vec<FuncParser>
+pub struct ResultParser {
+	pub signature: TokenList,
+	pub functions: Vec<FuncParser>
 }
 
-fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
+pub fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 	let mut program_parser = ProgramParser::default();
 
 	let mut token = 0;

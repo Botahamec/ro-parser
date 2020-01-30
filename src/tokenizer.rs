@@ -11,7 +11,6 @@ const WHITESPACE : [char; 4] = [' ', '\n', '\t', '\r'];
 #[derive(PartialEq)]
 enum TokenizerMode {
 	LineComment,
-	BlockComment,
 	Operator,
 	Normal
 }
