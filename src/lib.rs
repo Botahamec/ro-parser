@@ -3,6 +3,7 @@
 extern crate ro_backend;
 
 mod tokenizer;
+mod function;
 
 #[cfg(test)]
 mod tests;
