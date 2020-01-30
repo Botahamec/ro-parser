@@ -22,8 +22,8 @@ pub type TokenList = Vec<String>;
  * Converts Ro code into a list of tokens
  * Does not remove block comments
  *
- * @author	Mike White
- * @param	code the code as a String
+ * @author  Mike White
+ * @param   code the code as a String
  */
 pub fn tokenize_with_block_comments(code: String) -> TokenList {
 
@@ -56,7 +56,7 @@ pub fn tokenize_with_block_comments(code: String) -> TokenList {
 				current_token.push(character.clone());
 
 				// ignores the rest of the line if there's a line comment
-				if current_token == String::from("//") {
+				if current_token == "//" {
 					current_token = String::new();
 					mode = TokenizerMode::LineComment;
 
@@ -84,7 +84,7 @@ pub fn tokenize_with_block_comments(code: String) -> TokenList {
 		}
 	}
 	if current_token != String::new() {
-		tokens.push(current_token.clone());
+		tokens.push(current_token);
 	}
 	tokens
 }
@@ -94,9 +94,9 @@ pub fn remove_block_comments(tokens: TokenList) -> TokenList {
 	let mut new_list = TokenList::new();
 
 	for token in tokens {
-		if token == String::from("/*") {
+		if token == "/*" {
 			in_comment = true;
-		} else if token == String::from("*/") {
+		} else if token == "*/" {
 			in_comment = false;
 		} else if !in_comment {
 			new_list.push(token);

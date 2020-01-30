@@ -9,9 +9,9 @@ mod tests;
 
 use std::collections::LinkedList;
 
-use ro_backend::{Program, Function, Parameter};
+//use ro_backend::{Program, Function, Parameter};
 
-use tokenizer::{tokenize, TokenList};
+use tokenizer::{TokenList};
 
 #[derive(PartialEq, Clone)]
 enum LexMode {
@@ -62,11 +62,11 @@ fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
 
 	let mut token = 0;
 	while token < tokens.len() {
-		if tokens[token] == String::from("fn") {
+		if tokens[token] == "fn" {
 
 			let mut signature = TokenList::new();
 			token += 1;
-			while tokens[token] != String::from("{") {
+			while tokens[token] != "{" {
 				signature.push(tokens[token].clone());
 				token += 1;
 			}
@@ -75,8 +75,8 @@ fn parse_for_fns(tokens: TokenList) -> Vec<FuncParser> {
 			let mut brackets : usize = 1; // the number of brackets that need to be closed
 			loop {
 				token += 1;
-				if tokens[token] == String::from("{") {brackets += 1;}
-				if tokens[token] == String::from("}") {brackets -= 1;}
+				if tokens[token] == "{" {brackets += 1;}
+				if tokens[token] == "}" {brackets -= 1;}
 				if brackets == 0 {break;}
 				code.push(tokens[token].clone());
 			}
@@ -94,11 +94,11 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 
 	let mut token = 0;
 	while token < tokens.len() {
-		if tokens[token] == String::from("fn") {
+		if tokens[token] == "fn" {
 
 			let mut signature = TokenList::new();
 			token += 1;
-			while tokens[token] != String::from("{") {
+			while tokens[token] != "fn" {
 				signature.push(tokens[token].clone());
 				token += 1;
 			}
@@ -107,8 +107,8 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 			let mut brackets : usize = 1; // the number of brackets that need to be closed
 			loop {
 				token += 1;
-				if tokens[token] == String::from("{") {brackets += 1;}
-				if tokens[token] == String::from("}") {brackets -= 1;}
+				if tokens[token] == "{" {brackets += 1;}
+				if tokens[token] == "}" {brackets -= 1;}
 				if brackets == 0 {break;}
 				code.push(tokens[token].clone());
 			}
@@ -116,11 +116,11 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 			program_parser.functions.push(FuncParser {signature, code})
 		}
 
-		if tokens[token] == String::from("result") {
+		if tokens[token] == "result" {
 
 			let mut signature = TokenList::new();
 			token += 1;
-			while tokens[token] != String::from("{") {
+			while tokens[token] != "{" {
 				signature.push(tokens[token].clone());
 				token += 1;
 			}
@@ -129,8 +129,8 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 			let mut brackets : usize = 1; // the number of brackets that need to be closed
 			loop {
 				token += 1;
-				if tokens[token] == String::from("{") {brackets += 1;}
-				if tokens[token] == String::from("}") {brackets -= 1;}
+				if tokens[token] == "{" {brackets += 1;}
+				if tokens[token] == "}" {brackets -= 1;}
 				if brackets == 0 {break;}
 				code.push(tokens[token].clone());
 			}
@@ -143,6 +143,7 @@ fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 }
 
 // TODO: remove unwraps
+/*
 fn lexer(tokens: TokenList) -> Program {
 
 	let mut new_program = Program::default();
@@ -178,7 +179,7 @@ fn lexer(tokens: TokenList) -> Program {
 	}
 
 	new_program
-}
+}*/
 
 // the main function
-fn parse(code: String) -> Program {lexer(tokenize(code))}
+//fn parse(code: String) -> Program {tokenize(code)}
