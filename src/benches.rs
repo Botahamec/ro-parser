@@ -30,7 +30,6 @@ fn parse_fns_bench(b: &mut Bencher) {
 }
 
 #[bench]
-#[ignore]
 fn parse_results_bench(b: &mut Bencher) {
 	let code = read_to_string("src/benchmark.ro").unwrap();
 	let tokens = tokenize(code);

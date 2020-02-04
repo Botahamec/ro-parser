@@ -65,7 +65,7 @@ pub fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 
 			let mut signature = TokenList::new();
 			token += 1;
-			while tokens[token] != "fn" {
+			while tokens[token] != "{" {
 				signature.push(tokens[token].clone());
 				token += 1;
 			}
@@ -82,6 +82,8 @@ pub fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 
 			program_parser.functions.push(FuncParser {signature, code})
 		}
+
+		if token > tokens.len() {break;} // prevents an error here
 
 		if tokens[token] == "result" {
 
@@ -105,6 +107,8 @@ pub fn parse_for_results_and_fns(tokens: TokenList) -> ProgramParser {
 			let functions = FuncParser::vec_from_tokens(code);
 			program_parser.results.push(ResultParser{signature, functions});
 		}
+
+		token += 1;
 	}
 	program_parser
 }

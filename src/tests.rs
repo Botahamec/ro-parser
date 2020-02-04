@@ -104,6 +104,30 @@ fn parse_results_test() {
 
 	let string_vec = |vec: Vec<&str>| -> Vec<String> {vec.iter().map(|s| String::from(*s)).collect()};
 
+	// a basic result
 	let mut tokens = string_vec(vec!["result", "add", "(", "one", ":", "float", ",", "two", ":", "float", ")", "{", "}"]);
-	assert_eq!(parse_for_results_and_fns(tokens), ProgramParser{results: vec![], functions: vec![]});
+	let mut signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")"]);
+	let mut functions : Vec<FuncParser> = vec![];
+	assert_eq!(parse_for_results_and_fns(tokens), ProgramParser{results: vec![ResultParser {signature, functions: functions.clone()}], functions});
+
+	// a result containing a function
+	tokens = string_vec(vec!["result", "add", "(", "one", ":", "float", ",", "two", ":", "float", ")", "{", "fn", "{", "return", "one", "+", "two", "}", "}"]);
+	signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")"]);
+	functions = vec![FuncParser {signature: vec![], code: string_vec(vec!["return", "one", "+", "two"])}];
+	assert_eq!(parse_for_results_and_fns(tokens), ProgramParser{results: vec![ResultParser {signature, functions: functions.clone()}], functions: vec![]});
+
+	// a result containing two functions
+	tokens = string_vec(vec!["result", "add", "(", "one", ":", "float", ",", "two", ":", "float", ")", "{", "fn", "{", "return", "one", "+", "two", "}", "fn", "{", "return", "one", "+", "two", "}", "}"]);
+	signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")"]);
+	let mut function = FuncParser {signature: vec![], code: string_vec(vec!["return", "one", "+", "two"])};
+	functions = vec![function.clone(), function.clone()];
+	assert_eq!(parse_for_results_and_fns(tokens), ProgramParser{results: vec![ResultParser {signature, functions: functions.clone()}], functions: vec![]});
+
+	// a function outside of the result
+	tokens = string_vec(vec!["result", "add", "(", "one", ":", "float", ",", "two", ":", "float", ")", "{", "fn", "{", "return", "one", "+", "two", "}", "}", "fn", "=>", "add", "{", "return", "one", "+", "two", "}"]);
+	signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")"]);
+	function = FuncParser {signature: vec![], code: string_vec(vec!["return", "one", "+", "two"])};
+	functions = vec![function];
+	let function1 = FuncParser {signature: string_vec(vec!["=>", "add"]), code: string_vec(vec!["return", "one", "+", "two"])};
+	assert_eq!(parse_for_results_and_fns(tokens), ProgramParser{results: vec![ResultParser {signature, functions: functions.clone()}], functions: vec![function1]});
 }

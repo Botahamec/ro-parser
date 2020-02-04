@@ -1,7 +1,7 @@
 
 use crate::TokenList;
 
-#[derive(Default, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct FuncParser {
 	pub signature: TokenList,
 	pub code: TokenList
