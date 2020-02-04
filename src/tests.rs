@@ -98,3 +98,12 @@ fn parse_fns_test() {
 	assert_eq!(fns[1], FuncParser{signature, code});
 
 }
+
+#[test]
+fn parse_results_test() {
+
+	let string_vec = |vec: Vec<&str>| -> Vec<String> {vec.iter().map(|s| String::from(*s)).collect()};
+
+	let mut tokens = string_vec(vec!["result", "add", "(", "one", ":", "float", ",", "two", ":", "float", ")", "{", "}"]);
+	assert_eq!(parse_for_results_and_fns(tokens), ProgramParser{results: vec![], functions: vec![]});
+}

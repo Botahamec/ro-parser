@@ -1,4 +1,6 @@
 
+#![feature(test)]
+
 extern crate ro_backend;
 
 mod tokenizer;
@@ -6,6 +8,9 @@ mod function;
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod benches;
 
 use std::collections::LinkedList;
 
@@ -39,13 +44,13 @@ impl LexStack {
 	}
 }
 
-#[derive(Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct ProgramParser {
 	pub results: Vec<ResultParser>,
 	pub functions: Vec<FuncParser>
 }
 
-#[derive(Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct ResultParser {
 	pub signature: TokenList,
 	pub functions: Vec<FuncParser>

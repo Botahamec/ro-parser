@@ -1,0 +1,34 @@
+/*
+ * block comment
+ */
+result add(one: float, two: float) : float {
+	fn {
+		//* a comment that has been toggled off
+		return one + two
+		*/
+	}
+
+	fn add1 {
+		/// docstring
+		var temp : float = one + two
+		return temp
+	}
+
+	fn(first = one, second = two) {
+		return first + second
+	}
+
+	fn add2() {
+		return one + two
+	}
+}
+
+fn => add {
+	var one' = one + 1 - 1
+	return one' + two
+}
+
+fn main() {
+	// comment
+	print(add(1, 2))
+}
