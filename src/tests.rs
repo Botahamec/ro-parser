@@ -2,6 +2,9 @@
 use crate::*;
 use tokenizer::*;
 use function::*;
+use result_sig::*;
+
+use std::collections::HashMap;
 
 #[test]
 fn tokenize_test() {
@@ -131,3 +134,34 @@ fn parse_results_test() {
 	let function1 = FuncParser {signature: string_vec(vec!["=>", "add"]), code: string_vec(vec!["return", "one", "+", "two"])};
 	assert_eq!(parse_for_results_and_fns(tokens), ProgramParser{results: vec![ResultParser {signature, functions: functions.clone()}], functions: vec![function1]});
 }
+
+#[test]
+fn parse_result_sig_test() {
+
+	let string_vec = |vec: Vec<&str>| -> Vec<String> {vec.iter().map(|s| String::from(*s)).collect()};
+
+	// complicated signature
+	let mut signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float"]);
+	let mut parameters = HashMap::new();
+	let rt = Some(String::from("float"));
+	let name = String::from("add");
+	parameters.insert(String::from("one"), String::from("float"));
+	parameters.insert(String::from("two"), String::from("float"));
+	assert_eq!(parse_signature(signature), ResultSig{name: name.clone(), return_type: rt.clone(), parameters: parameters.clone()});
+
+	// simple signature
+	signature = string_vec(vec!["add", "(", ")"]);
+	parameters.clear();
+	assert_eq!(parse_signature(signature), ResultSig{name: name.clone(), return_type: None, parameters: parameters.clone()});
+
+	// return signature
+	signature = string_vec(vec!["add", "(", ")", ":", "float"]);
+	assert_eq!(parse_signature(signature), ResultSig{name: name.clone(), return_type: rt.clone(), parameters: parameters.clone()});
+
+	// one parameter with an unnecessary comma
+	signature = string_vec(vec!["add", "(", "one", ":", "float", ",", ")"]);
+	parameters.insert(String::from("one"), String::from("float"));
+	assert_eq!(parse_signature(signature), ResultSig{name: name.clone(), return_type: None, parameters: parameters.clone()});
+}
+
+#[test]

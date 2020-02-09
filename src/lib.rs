@@ -45,13 +45,13 @@ impl LexStack {
 	}
 }
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct ProgramParser {
 	pub results: Vec<ResultParser>,
 	pub functions: Vec<FuncParser>
 }
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct ResultParser {
 	pub signature: TokenList,
 	pub functions: Vec<FuncParser>

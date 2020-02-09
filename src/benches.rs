@@ -2,6 +2,7 @@
 use crate::*;
 use tokenizer::*;
 use function::*;
+use result_sig::*;
 
 use std::fs::read_to_string;
 
@@ -35,4 +36,13 @@ fn parse_results_bench(b: &mut Bencher) {
 	let tokens = tokenize(code);
 	let parse = |tokens: TokenList| -> ProgramParser {parse_for_results_and_fns(tokens)};
 	b.iter(|| parse(tokens.clone()))
+}
+
+#[bench]
+fn parse_result_sig_bench(b: &mut Bencher) {
+	let code = read_to_string("src/benchmark.ro").unwrap();
+	let tokens = tokenize(code);
+	let program_parse = parse_for_results_and_fns(tokens);
+	let signature = program_parse.results[0].clone().signature;
+	b.iter(|| parse_signature(signature.clone()))
 }
