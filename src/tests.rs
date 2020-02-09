@@ -165,3 +165,75 @@ fn parse_result_sig_test() {
 }
 
 #[test]
+fn parse_fn_signature_test() {
+
+	let string_vec = |vec: Vec<&str>| -> Vec<String> {vec.iter().map(|s| String::from(*s)).collect()};
+
+	let mut func_parser = FuncParser::default();
+
+	// empty function signature
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: None, parameters: None, return_type: None, result: None});
+
+	// named function
+	func_parser.signature = string_vec(vec!["add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: None, return_type: None, result: None});
+
+	// named with return type
+	func_parser.signature = string_vec(vec!["add", ":", "float"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: None, return_type: Some(String::from("float")), result: None});
+
+	// just return type
+	func_parser.signature = string_vec(vec![":", "float"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: None, parameters: None, return_type: Some(String::from("float")), result: None});
+
+	// named with parameter
+	func_parser.signature = string_vec(vec!["add", "(", "one", ":", "float", ")"]);
+	let mut parameters = HashMap::new();
+	parameters.insert(String::from("one"), String::from("float"));
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: Some(parameters.clone()), return_type: None, result: None});
+
+	// named with parameters
+	func_parser.signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")"]);
+	parameters.insert(String::from("two"), String::from("float"));
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: Some(parameters.clone()), return_type: None, result: None});
+
+	// named with parameters and a return type
+	func_parser.signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: Some(parameters.clone()), return_type: Some(String::from("float")), result: None});
+
+	// parameters and a return type
+	func_parser.signature = string_vec(vec!["(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: None, parameters: Some(parameters.clone()), return_type: Some(String::from("float")), result: None});
+
+	// standalone function
+	func_parser.signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: Some(parameters.clone()), return_type: Some(String::from("float")), result: None});
+
+	// result
+	func_parser.signature = string_vec(vec!["=>", "add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: None, parameters: None, return_type: None, result: Some(String::from("add"))});
+
+	// name and result
+	func_parser.signature = string_vec(vec!["add", "=>", "add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: None, return_type: None, result: Some(String::from("add"))});
+
+	// return type and result
+	func_parser.signature = string_vec(vec![":", "float", "=>", "add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: None, parameters: None, return_type: Some(String::from("float")), result: Some(String::from("add"))});
+
+	// parameters and result
+	func_parser.signature = string_vec(vec!["(", "one", ":", "float", ",", "two", ":", "float", ")", "=>", "add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: None, parameters: Some(parameters.clone()), return_type: None, result: Some(String::from("add"))});
+
+	// named function with parameters and result
+	func_parser.signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")", "=>", "add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: Some(parameters.clone()), return_type: None, result: Some(String::from("add"))});
+
+	// complete function signature
+	func_parser.signature = string_vec(vec!["add", "(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float", "=>", "add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: Some(String::from("add")), parameters: Some(parameters.clone()), return_type: Some(String::from("float")), result: Some(String::from("add"))});
+
+	// complete unnamed function signature
+	func_parser.signature = string_vec(vec!["(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float", "=>", "add"]);
+	assert_eq!(func_parser.clone().parse_signature(), FuncSig{name: None, parameters: Some(parameters.clone()), return_type: Some(String::from("float")), result: Some(String::from("add"))});
+}

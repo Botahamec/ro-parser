@@ -62,35 +62,41 @@ impl FuncParser {
 		let mut token : usize = 0;
 		let mut signature = FuncSig::default();
 
-		if tokens[token] != "(" && tokens[token] != ":" && tokens[token] != "=>" {
+		if token < tokens.len() && tokens[token] != "(" && tokens[token] != ":" && tokens[token] != "=>" {
 			signature.name = Some(tokens[token].clone());
 			token += 1;
 		} else {
 			signature.name = None;
 		}
 
-		if tokens[token] == "(" {
+		if token < tokens.len() && tokens[token] == "(" {
 			token += 1;
 			signature.parameters = Some(HashMap::new());
-			while tokens[token] != ")" {
+			while token < tokens.len() - 3 && tokens[token] != ")" {
+				if tokens[token] == "," {token += 1; continue;}
 				let parameter_name = tokens[token].clone();
 				let parameter_type = tokens[token + 2].clone();
 				signature.parameters.as_mut().unwrap().insert(parameter_name, parameter_type);
 				token += 3;
 			}
+			while tokens[token] != ")" {
+				token += 1;
+			}
+			token += 1;
 		} else {
 			signature.parameters = None;
 		}
 
-		if tokens[token] == ":" {
-			token += 2;
+		if tokens.len() > 0 && token < tokens.len() - 1 && tokens[token] == ":" {
+			token += 1;
 			signature.return_type = Some(tokens[token].clone());
+			token += 1;
 		} else {
 			signature.return_type = None;
 		}
 
-		if tokens[token] == "=>" {
-			token += 2;
+		if tokens.len() > 0 && token < tokens.len() - 1 && tokens[token] == "=>" {
+			token += 1;
 			signature.result = Some(tokens[token].clone());
 		} else {
 			signature.result = None;

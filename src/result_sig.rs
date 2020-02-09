@@ -22,7 +22,7 @@ pub fn parse_signature(tokens: TokenList) -> ResultSig {
 		signature.parameters.insert(parameter_name, parameter_type);
 		token += 3;
 	}
-	if token < tokens.len() - 2 && tokens[token + 1] == ":" {
+	if tokens.len() >= 2 && token < tokens.len() - 2 && tokens[token + 1] == ":" {
 		signature.return_type = Some(tokens[token + 2].clone());
 	} else {
 		signature.return_type = None;
