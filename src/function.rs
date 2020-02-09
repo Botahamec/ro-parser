@@ -1,10 +1,20 @@
 
 use crate::TokenList;
 
+use std::collections::HashMap;
+
 #[derive(Clone, Default, Debug, PartialEq)]
 pub struct FuncParser {
 	pub signature: TokenList,
 	pub code: TokenList
+}
+
+#[derive(Clone, Default, Debug, PartialEq)]
+pub struct FuncSig {
+	pub name: Option<String>,
+	pub parameters: Option<HashMap<String, String>>,
+	pub return_type: Option<String>,
+	pub result: Option<String>
 }
 
 impl FuncParser {
@@ -44,5 +54,48 @@ impl FuncParser {
 	pub fn vec_from_string(code: String) -> Vec<FuncParser> {
 		let tokens = crate::tokenizer::tokenize(code);
 		Self::vec_from_tokens(tokens)
+	}
+
+	pub fn parse_signature(self) -> FuncSig {
+
+		let tokens = self.signature;
+		let mut token : usize = 0;
+		let mut signature = FuncSig::default();
+
+		if tokens[token] != "(" && tokens[token] != ":" && tokens[token] != "=>" {
+			signature.name = Some(tokens[token].clone());
+			token += 1;
+		} else {
+			signature.name = None;
+		}
+
+		if tokens[token] == "(" {
+			token += 1;
+			signature.parameters = Some(HashMap::new());
+			while tokens[token] != ")" {
+				let parameter_name = tokens[token].clone();
+				let parameter_type = tokens[token + 2].clone();
+				signature.parameters.as_mut().unwrap().insert(parameter_name, parameter_type);
+				token += 3;
+			}
+		} else {
+			signature.parameters = None;
+		}
+
+		if tokens[token] == ":" {
+			token += 2;
+			signature.return_type = Some(tokens[token].clone());
+		} else {
+			signature.return_type = None;
+		}
+
+		if tokens[token] == "=>" {
+			token += 2;
+			signature.result = Some(tokens[token].clone());
+		} else {
+			signature.result = None;
+		}
+
+		signature
 	}
 }
