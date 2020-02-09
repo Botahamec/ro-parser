@@ -46,3 +46,11 @@ fn parse_result_sig_bench(b: &mut Bencher) {
 	let signature = program_parse.results[0].clone().signature;
 	b.iter(|| parse_signature(signature.clone()))
 }
+
+#[bench]
+fn parse_fn_sig_bench(b: &mut Bencher) {
+	let string_vec = |vec: Vec<&str>| -> Vec<String> {vec.iter().map(|s| String::from(*s)).collect()};
+	let mut func_parser = FuncParser::default();
+	func_parser.signature = string_vec(vec!["(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float", "=>", "add"]);
+	b.iter(|| func_parser.clone().parse_signature())
+}
