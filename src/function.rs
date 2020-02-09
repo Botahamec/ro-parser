@@ -87,7 +87,7 @@ impl FuncParser {
 			signature.parameters = None;
 		}
 
-		if tokens.len() > 0 && token < tokens.len() - 1 && tokens[token] == ":" {
+		if !tokens.is_empty() && token < tokens.len() - 1 && tokens[token] == ":" {
 			token += 1;
 			signature.return_type = Some(tokens[token].clone());
 			token += 1;
@@ -95,7 +95,7 @@ impl FuncParser {
 			signature.return_type = None;
 		}
 
-		if tokens.len() > 0 && token < tokens.len() - 1 && tokens[token] == "=>" {
+		if !tokens.is_empty() && token < tokens.len() - 1 && tokens[token] == "=>" {
 			token += 1;
 			signature.result = Some(tokens[token].clone());
 		} else {
