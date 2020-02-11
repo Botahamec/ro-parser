@@ -413,7 +413,7 @@ fn parse_result_sig_test() {
         ResultSig {
             name: name.clone(),
             return_type: rt,
-            parameters: parameters
+            parameters: parameters.clone()
         }
     );
 
