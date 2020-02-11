@@ -1,5 +1,5 @@
 use crate::function::FuncParser;
-use crate::TokenList;
+use crate::tokenizer::TokenList;
 
 use std::collections::HashMap;
 

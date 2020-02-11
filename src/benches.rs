@@ -1,5 +1,6 @@
 use crate::*;
 use function::*;
+use program::*;
 use result::*;
 use tokenizer::*;
 
@@ -33,7 +34,7 @@ fn parse_fns_bench(b: &mut Bencher) {
 fn parse_results_bench(b: &mut Bencher) {
     let code = read_to_string("src/benchmark.ro").unwrap();
     let tokens = tokenize(code);
-    let parse = |tokens: TokenList| -> ProgramParser { parse_for_results_and_fns(tokens) };
+    let parse = |tokens: TokenList| -> ProgramParser { ProgramParser::from_tokens(tokens) };
     b.iter(|| parse(tokens.clone()))
 }
 
@@ -41,7 +42,7 @@ fn parse_results_bench(b: &mut Bencher) {
 fn parse_result_sig_bench(b: &mut Bencher) {
     let code = read_to_string("src/benchmark.ro").unwrap();
     let tokens = tokenize(code);
-    let program_parse = parse_for_results_and_fns(tokens);
+    let program_parse = ProgramParser::from_tokens(tokens);
     let signature = program_parse.results[0].clone().signature;
     b.iter(|| ResultSig::from_tokens(signature.clone()))
 }

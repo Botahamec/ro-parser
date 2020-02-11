@@ -1,5 +1,6 @@
 use crate::*;
 use function::*;
+use program::*;
 use result::*;
 use tokenizer::*;
 
@@ -283,7 +284,7 @@ fn parse_results_test() {
     ]);
     let mut functions: Vec<FuncParser> = vec![];
     assert_eq!(
-        parse_for_results_and_fns(tokens),
+        ProgramParser::from_tokens(tokens),
         ProgramParser {
             results: vec![ResultParser {
                 signature,
@@ -306,7 +307,7 @@ fn parse_results_test() {
         code: string_vec(vec!["return", "one", "+", "two"]),
     }];
     assert_eq!(
-        parse_for_results_and_fns(tokens),
+        ProgramParser::from_tokens(tokens),
         ProgramParser {
             results: vec![ResultParser {
                 signature,
@@ -330,7 +331,7 @@ fn parse_results_test() {
     };
     functions = vec![function.clone(), function.clone()];
     assert_eq!(
-        parse_for_results_and_fns(tokens),
+        ProgramParser::from_tokens(tokens),
         ProgramParser {
             results: vec![ResultParser {
                 signature,
@@ -359,7 +360,7 @@ fn parse_results_test() {
         code: string_vec(vec!["return", "one", "+", "two"]),
     };
     assert_eq!(
-        parse_for_results_and_fns(tokens),
+        ProgramParser::from_tokens(tokens),
         ProgramParser {
             results: vec![ResultParser {
                 signature,
