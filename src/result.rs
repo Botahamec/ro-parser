@@ -1,7 +1,15 @@
 
 use crate::TokenList;
+use crate::function::FuncParser;
+use crate::ProgramParser;
 
 use std::collections::HashMap;
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ResultParser {
+	pub signature: TokenList,
+	pub functions: Vec<FuncParser>
+}
 
 #[derive(Debug, Default, PartialEq)]
 pub struct ResultSig {

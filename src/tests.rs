@@ -2,7 +2,7 @@
 use crate::*;
 use tokenizer::*;
 use function::*;
-use result_sig::*;
+use result::*;
 
 use std::collections::HashMap;
 
