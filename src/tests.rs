@@ -364,7 +364,7 @@ fn parse_results_test() {
         ProgramParser {
             results: vec![ResultParser {
                 signature,
-                functions: functions.clone()
+                functions
             }],
             functions: vec![function1]
         }
@@ -412,8 +412,8 @@ fn parse_result_sig_test() {
         ResultSig::from_tokens(signature),
         ResultSig {
             name: name.clone(),
-            return_type: rt.clone(),
-            parameters: parameters.clone()
+            return_type: rt,
+            parameters: parameters
         }
     );
 
@@ -423,9 +423,9 @@ fn parse_result_sig_test() {
     assert_eq!(
         ResultSig::from_tokens(signature),
         ResultSig {
-            name: name.clone(),
+            name,
             return_type: None,
-            parameters: parameters.clone()
+            parameters
         }
     );
 }
@@ -638,10 +638,10 @@ fn parse_fn_signature_test() {
         "(", "one", ":", "float", ",", "two", ":", "float", ")", ":", "float", "=>", "add",
     ]);
     assert_eq!(
-        func_parser.clone().parse_signature(),
+        func_parser.parse_signature(),
         FuncSig {
             name: None,
-            parameters: Some(parameters.clone()),
+            parameters: Some(parameters),
             return_type: Some(String::from("float")),
             result: Some(String::from("add"))
         }

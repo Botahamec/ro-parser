@@ -60,7 +60,7 @@ impl FuncParser {
     }
 
     pub fn parse_signature(self) -> FuncSig {
-        FuncSig::from_tokens(self.signature.clone())
+        FuncSig::from_tokens(self.signature)
     }
 }
 
