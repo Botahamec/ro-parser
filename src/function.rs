@@ -16,6 +16,24 @@ pub struct FuncSig {
     pub result: Option<String>,
 }
 
+pub enum CallType {
+    Return(String),
+}
+
+pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
+    let mut token: usize = 0;
+    let mut calls: Vec<CallType> = Vec::new();
+    while token < tokens.len() {
+        if tokens[token] == "return" {
+            token += 1;
+            calls.push(CallType::Return(tokens[token].clone()));
+            token += 1;
+        }
+    }
+
+    calls
+}
+
 impl FuncParser {
     pub fn vec_from_tokens(tokens: TokenList) -> Vec<FuncParser> {
         let mut funcs = Vec::new();
