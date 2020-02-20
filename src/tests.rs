@@ -647,3 +647,13 @@ fn parse_fn_signature_test() {
         }
     );
 }
+
+#[test]
+fn parse_func_test() {
+    let string_vec =
+        |vec: Vec<&str>| -> Vec<String> { vec.iter().map(|s| String::from(*s)).collect() };
+
+    // just a return statement
+    let mut code = string_vec(vec!["ret", "0"]);
+    assert_eq!(parse_code(code), vec![CallType::Return(String::from("0"))]);
+}

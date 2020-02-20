@@ -16,6 +16,7 @@ pub struct FuncSig {
     pub result: Option<String>,
 }
 
+#[derive(Debug, PartialEq)]
 pub enum CallType {
     Return(String),
 }
@@ -24,7 +25,7 @@ pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
     let mut token: usize = 0;
     let mut calls: Vec<CallType> = Vec::new();
     while token < tokens.len() {
-        if tokens[token] == "return" {
+        if tokens[token] == "ret" {
             token += 1;
             calls.push(CallType::Return(tokens[token].clone()));
             token += 1;

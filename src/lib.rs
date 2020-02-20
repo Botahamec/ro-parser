@@ -3,9 +3,9 @@
 extern crate ro_backend;
 
 pub mod function;
+pub mod program;
 pub mod result;
 pub mod tokenizer;
-pub mod program;
 
 #[cfg(test)]
 mod tests;
