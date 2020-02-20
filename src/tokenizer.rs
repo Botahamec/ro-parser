@@ -1,7 +1,7 @@
 use std::iter::FromIterator;
 
 // a list of valid operators
-const OPERATORS: [&str; 17] = [
+pub const OPERATORS: [&str; 17] = [
 	"(", ":", ",", ".", ")", "{", "}", ">", "=", "+", "-", "*", "/", "=>",
 	"//", "/*", "*/",
 ];

@@ -1,5 +1,7 @@
 #![feature(test)]
 
+#![allow(clippy::tabs_in_doc_comments)]
+
 extern crate ro_backend;
 
 pub mod function;

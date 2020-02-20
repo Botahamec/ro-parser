@@ -19,6 +19,8 @@ pub struct FuncSig {
 #[derive(Debug, PartialEq)]
 pub enum CallType {
 	Return(String),
+	Initialize(String),
+	Set(String, TokenList),
 }
 
 pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
@@ -28,8 +30,34 @@ pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
 		if tokens[token] == "ret" {
 			token += 1;
 			calls.push(CallType::Return(tokens[token].clone()));
-			token += 1;
 		}
+
+		if tokens[token] == "var" {
+			token += 1;
+			let var_name = tokens[token].clone();
+			calls.push(CallType::Initialize(var_name.clone()));
+			if tokens[token + 1] == "=" {
+				token += 2;
+				let mut set: TokenList = Vec::with_capacity(1);
+				set.push(tokens[token].clone());
+				token += 1;
+				while crate::tokenizer::OPERATORS
+					.contains(&tokens[token].as_str())
+				{
+					while crate::tokenizer::OPERATORS
+						.contains(&tokens[token].as_str())
+					{
+						token += 1;
+						set.push(tokens[token].clone());
+					}
+					token += 1;
+					set.push(tokens[token].clone());
+				}
+				calls.push(CallType::Set(var_name, set));
+			}
+		}
+
+		token += 1;
 	}
 
 	calls
