@@ -684,4 +684,139 @@ fn parse_func_test() {
 	// just a return statement
 	let mut code = string_vec(vec!["ret", "0"]);
 	assert_eq!(parse_code(code), vec![CallType::Return(String::from("0"))]);
+
+	// just initializes a variable
+	code = string_vec(vec!["var", "var1"]);
+	assert_eq!(parse_code(code), vec![CallType::Init(String::from("var1"))]);
+
+	// sets a new var
+	code = string_vec(vec!["var", "var1", "=", "3"]);
+	assert_eq!(
+		parse_code(code),
+		vec![
+			CallType::Init(String::from("var1")),
+			CallType::Set(String::from("var1"), string_vec(vec!["3"]))
+		]
+	);
+
+	// sets a new var to an operation
+	code = string_vec(vec!["var", "var1", "=", "3", "+", "2", "*", "7"]);
+	assert_eq!(
+		parse_code(code),
+		vec![
+			CallType::Init(String::from("var1")),
+			CallType::Set(
+				String::from("var1"),
+				string_vec(vec!["3", "+", "2", "*", "7"])
+			)
+		]
+	);
+
+	// initializes a variable and returns it
+	code = string_vec(vec!["var", "num", "=", "5", "ret", "num"]);
+	assert_eq!(
+		parse_code(code),
+		vec![
+			CallType::Init(String::from("num")),
+			CallType::Set(String::from("num"), string_vec(vec!["5"])),
+			CallType::Return(String::from("num"))
+		]
+	);
+
+	// initializes a variable and returns it
+	code = string_vec(vec!["var", "num", "=", "5", "+", "3", "ret", "num"]);
+	assert_eq!(
+		parse_code(code),
+		vec![
+			CallType::Init(String::from("num")),
+			CallType::Set(String::from("num"), string_vec(vec!["5", "+", "3"])),
+			CallType::Return(String::from("num"))
+		]
+	);
+
+	// simply sets a pre-exiting var
+	code = string_vec(vec!["num", "=", "5"]);
+	assert_eq!(
+		parse_code(code),
+		vec![CallType::Set(String::from("num"), string_vec(vec!["5"]))]
+	);
+
+	// sets a pre-exiting var to the result of an operation
+	code = string_vec(vec!["num", "=", "5", "+", "3", "*", "7"]);
+	assert_eq!(
+		parse_code(code),
+		vec![CallType::Set(
+			String::from("num"),
+			string_vec(vec!["5", "+", "3", "*", "7"])
+		)]
+	);
+
+	// initializes and sets a variable
+	code = string_vec(vec!["var", "num", "num", "=", "5", "+", "3", "*", "7"]);
+	assert_eq!(
+		parse_code(code),
+		vec![
+			CallType::Init(String::from("num")),
+			CallType::Set(
+				String::from("num"),
+				string_vec(vec!["5", "+", "3", "*", "7"])
+			)
+		]
+	);
+
+	// initializes and sets a variable, then returns it
+	code = string_vec(vec![
+		"var", "num", "num", "=", "5", "+", "3", "*", "7", "ret", "num",
+	]);
+	assert_eq!(
+		parse_code(code),
+		vec![
+			CallType::Init(String::from("num")),
+			CallType::Set(
+				String::from("num"),
+				string_vec(vec!["5", "+", "3", "*", "7"])
+			),
+			CallType::Return(String::from("num"))
+		]
+	);
+
+	// parameter-less function call
+	code = string_vec(vec!["print", "(", ")"]);
+	assert_eq!(
+		parse_code(code),
+		vec![CallType::Call(String::from("print"), vec![])]
+	);
+
+	// parameter function call
+	code = string_vec(vec!["print", "(", "num", ")"]);
+	assert_eq!(
+		parse_code(code),
+		vec![CallType::Call(
+			String::from("print"),
+			string_vec(vec!["num"])
+		)]
+	);
+
+	// parameters function call
+	code = string_vec(vec!["print", "(", "num", ",", "vart", ")"]);
+	assert_eq!(
+		parse_code(code),
+		vec![CallType::Call(
+			String::from("print"),
+			string_vec(vec!["num", "vart"])
+		)]
+	);
+
+	// return after print
+	code = string_vec(vec!["print", "(", "num", ")", "ret", "void"]);
+	assert_eq!(
+		parse_code(code),
+		vec![
+			CallType::Call(
+				String::from("print"),
+				string_vec(vec!["num", "vart"])
+			),
+			CallType::Return(String::from("void"))
+		]
+	);
 }

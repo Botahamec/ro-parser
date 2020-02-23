@@ -19,8 +19,9 @@ pub struct FuncSig {
 #[derive(Debug, PartialEq)]
 pub enum CallType {
 	Return(String),
-	Initialize(String),
+	Init(String),
 	Set(String, TokenList),
+	Call(String, Vec<String>),
 }
 
 pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
@@ -30,31 +31,89 @@ pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
 		if tokens[token] == "ret" {
 			token += 1;
 			calls.push(CallType::Return(tokens[token].clone()));
-		}
-
-		if tokens[token] == "var" {
+		} else if tokens[token] == "var" {
 			token += 1;
 			let var_name = tokens[token].clone();
-			calls.push(CallType::Initialize(var_name.clone()));
-			if tokens[token + 1] == "=" {
+			calls.push(CallType::Init(var_name.clone()));
+			if tokens.len() > token + 1 && tokens[token + 1] == "=" {
 				token += 2;
 				let mut set: TokenList = Vec::with_capacity(1);
 				set.push(tokens[token].clone());
-				token += 1;
-				while crate::tokenizer::OPERATORS
-					.contains(&tokens[token].as_str())
+				/*if tokens.len() > token + 1
+					&& crate::tokenizer::OPERATORS
+						.contains(&tokens[token + 1].as_str())
 				{
-					while crate::tokenizer::OPERATORS
-						.contains(&tokens[token].as_str())
+					token += 1;
+					set.push(tokens[token].clone());
+				}*/
+				while tokens.len() > token + 1
+					&& crate::tokenizer::OPERATORS
+						.contains(&tokens[token + 1].as_str())
+				{
+					token += 1;
+					if tokens.len() > token
+						&& crate::tokenizer::OPERATORS
+							.contains(&tokens[token].as_str())
 					{
+						//token += 1;
+						set.push(tokens[token].clone());
 						token += 1;
 						set.push(tokens[token].clone());
 					}
-					token += 1;
-					set.push(tokens[token].clone());
+
+					/*if tokens.len() > token + 1 {
+						token += 1;
+						set.push(tokens[token].clone());
+					}*/
 				}
 				calls.push(CallType::Set(var_name, set));
 			}
+		} else if tokens.len() > token + 1 && tokens[token + 1] == "=" {
+			let var_name = tokens[token].clone();
+			token += 2;
+			let mut set: TokenList = Vec::with_capacity(1);
+			set.push(tokens[token].clone());
+			/*if tokens.len() > token + 1
+				&& crate::tokenizer::OPERATORS
+					.contains(&tokens[token + 1].as_str())
+			{
+				token += 1;
+				set.push(tokens[token].clone());
+			}*/
+			while tokens.len() > token + 1
+				&& crate::tokenizer::OPERATORS
+					.contains(&tokens[token + 1].as_str())
+			{
+				token += 1;
+				if tokens.len() > token
+					&& crate::tokenizer::OPERATORS
+						.contains(&tokens[token].as_str())
+				{
+					//token += 1;
+					set.push(tokens[token].clone());
+					token += 1;
+					set.push(tokens[token].clone());
+				}
+
+				/*if tokens.len() > token + 1 {
+					token += 1;
+					set.push(tokens[token].clone());
+				}*/
+			}
+			calls.push(CallType::Set(var_name, set));
+		} else if tokens.len() > 1 && tokens[token + 1] == "(" {
+			let func_name = tokens[token].clone();
+			token += 2;
+			let mut parameters: Vec<String> = vec![];
+			while tokens.len() > token && tokens[token] != ")" {
+				parameters.push(tokens[token].clone());
+				token += 1;
+				if tokens[token] == "," {
+					token += 1;
+				}
+			}
+
+			calls.push(CallType::Call(func_name, parameters));
 		}
 
 		token += 1;
