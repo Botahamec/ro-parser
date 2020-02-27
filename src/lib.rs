@@ -1,5 +1,5 @@
 
-#![feature(test)]
+//#![feature(test)]
 
 extern crate ro_backend;
 
@@ -14,8 +14,6 @@ mod tests;
 mod benches;
 
 use std::collections::LinkedList;
-
-//use ro_backend::{Program, Function, Parameter};
 
 use tokenizer::TokenList;
 use function::FuncParser;

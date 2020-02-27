@@ -21,5 +21,8 @@ pub fn parse_signature(tokens: TokenList) -> ResultSig {
 		signature.parameters.insert(parameter_name, parameter_type);
 		token += 3;
 	}
+	if tokens[token] == ":" {
+		signature.return_type = tokens[token + 1].clone();
+	}
 	signature
 }
