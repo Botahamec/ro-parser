@@ -1,18 +1,20 @@
-
 use std::iter::FromIterator;
 
 // a list of valid operators
-const OPERATORS : [&str; 17] = ["(", ":", ",", ".", ")", "{", "}", ">", "=", "+", "-", "*", "/", "=>", "//", "/*", "*/"];
+pub const OPERATORS: [&str; 17] = [
+	"(", ":", ",", ".", ")", "{", "}", ">", "=", "+", "-", "*", "/", "=>",
+	"//", "/*", "*/",
+];
 
 // a list of characters which are considered whitespace
-const WHITESPACE : [char; 4] = [' ', '\n', '\t', '\r'];
+const WHITESPACE: [char; 4] = [' ', '\n', '\t', '\r'];
 
 // tells the tokenizer what to expect next
 #[derive(PartialEq)]
 enum TokenizerMode {
 	LineComment,
 	Operator,
-	Normal
+	Normal,
 }
 
 pub type TokenList = Vec<String>;
@@ -25,14 +27,12 @@ pub type TokenList = Vec<String>;
  * @param   code the code as a String
  */
 pub fn tokenize_with_block_comments(code: String) -> TokenList {
-
 	let mut tokens = TokenList::new(); // what will be returned
 	let mut current_token = String::new(); // the token currently being parsed
 	let mut mode = TokenizerMode::Normal; // the mode that tells the tokenizer what to expect
 
 	// check each character in the String
 	for character in code.chars() {
-
 		// skip over the rest of the line if there's a line comment
 		if mode == TokenizerMode::LineComment {
 			if character == '\n' {
@@ -48,10 +48,14 @@ pub fn tokenize_with_block_comments(code: String) -> TokenList {
 			mode = TokenizerMode::Normal;
 
 		// runs if the character is an operator
-		} else if OPERATORS.contains(&String::from_iter(vec![character]).as_str()) {
-
+		} else if OPERATORS
+			.contains(&String::from_iter(vec![character]).as_str())
+		{
 			// runs if the character combined with the rest of the current token is an operator
-			if OPERATORS.contains(&(current_token.clone() + &String::from_iter(vec![character])).as_str()) {
+			if OPERATORS.contains(
+				&(current_token.clone() + &String::from_iter(vec![character]))
+					.as_str(),
+			) {
 				current_token.push(character.clone());
 
 				// ignores the rest of the line if there's a line comment
@@ -105,4 +109,6 @@ pub fn remove_block_comments(tokens: TokenList) -> TokenList {
 	new_list
 }
 
-pub fn tokenize(code: String) -> TokenList {remove_block_comments(tokenize_with_block_comments(code))}
+pub fn tokenize(code: String) -> TokenList {
+	remove_block_comments(tokenize_with_block_comments(code))
+}
