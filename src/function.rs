@@ -2,6 +2,8 @@ use crate::tokenizer::TokenList;
 
 use std::collections::HashMap;
 
+pub type CallList = Vec<CallType>;
+
 #[derive(Clone, Default, Debug, PartialEq)]
 pub struct FuncParser {
 	pub signature: TokenList,
@@ -16,12 +18,13 @@ pub struct FuncSig {
 	pub result: Option<String>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum CallType {
 	Return(String),
 	Init(String),
 	Set(String, TokenList),
 	Call(String, Vec<String>),
+	Move(String, String)
 }
 
 pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
@@ -122,7 +125,26 @@ pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
 	calls
 }
 
+/**
+ * Converts Set calls to Operate and Move calls
+ */
+pub fn sets_to_ops(calls: CallList) -> CallList {
+
+	let mut new_calls : CallList = vec![];
+
+	for call in calls.clone() {
+		if let CallType::Set(var, tokens) = call {
+			if tokens.len() == 1 {
+				new_calls.push(CallType::Move(var, tokens[0].clone()));
+			}
+		}
+	}
+
+	new_calls
+}
+
 impl FuncParser {
+	/** Creates a function parser from a tokenlist */
 	pub fn vec_from_tokens(tokens: TokenList) -> Vec<FuncParser> {
 		let mut funcs = Vec::new();
 

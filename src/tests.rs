@@ -820,3 +820,14 @@ fn parse_func_test() {
 		]
 	);
 }
+
+#[test]
+fn test_sets_to_ops() {
+
+	let string_vec = |vec: Vec<&str>| -> Vec<String> {
+		vec.iter().map(|s| String::from(*s)).collect()
+	};
+
+	let mut calls : CallList = vec![CallType::Set(String::from("var1"), string_vec(vec!["var2"]))];
+	assert_eq!(sets_to_ops(calls), vec![CallType::Move(String::from("var1"), String::from("var2"))]);
+}

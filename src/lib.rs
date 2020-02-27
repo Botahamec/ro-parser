@@ -11,8 +11,9 @@ pub mod tokenizer;
 #[cfg(test)]
 mod tests;
 
+/*
 #[cfg(test)]
 mod benches;
-
+*/
 // the main function
 //fn parse(code: String) -> Program {tokenize(code)}
