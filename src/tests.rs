@@ -814,7 +814,7 @@ fn parse_func_test() {
 		vec![
 			CallType::Call(
 				String::from("print"),
-				string_vec(vec!["num", "vart"])
+				string_vec(vec!["num"])
 			),
 			CallType::Return(String::from("void"))
 		]

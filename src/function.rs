@@ -19,12 +19,43 @@ pub struct FuncSig {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+pub enum Operation {
+	Add,
+	Sub,
+	Mult,
+	Div,
+	Mod,
+}
+
+impl Operation {
+	fn from_str(s: String) -> std::io::Result<Self> {
+		if s == "+" {
+			Ok(Operation::Add)
+		} else if s == "-" {
+			Ok(Operation::Sub)
+		} else if s == "*" {
+			Ok(Operation::Mult)
+		} else if s == "/" {
+			Ok(Operation::Div)
+		} else if s == "%" {
+			Ok(Operation::Mod)
+		} else {
+			Err(std::io::Error::new(
+				std::io::ErrorKind::InvalidData,
+				"invalid op",
+			))
+		}
+	}
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum CallType {
 	Return(String),
 	Init(String),
 	Set(String, TokenList),
 	Call(String, Vec<String>),
-	Move(String, String)
+	Move(String, String),
+	Operate(String, String, Operation, String),
 }
 
 pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
@@ -129,13 +160,19 @@ pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
  * Converts Set calls to Operate and Move calls
  */
 pub fn sets_to_ops(calls: CallList) -> CallList {
-
-	let mut new_calls : CallList = vec![];
+	let mut new_calls: CallList = vec![];
 
 	for call in calls.clone() {
 		if let CallType::Set(var, tokens) = call {
 			if tokens.len() == 1 {
 				new_calls.push(CallType::Move(var, tokens[0].clone()));
+			} else if tokens.len() == 3 {
+				new_calls.push(CallType::Operate(
+					var,
+					tokens[0].clone(),
+					Operation::from_str(tokens[1].clone()).unwrap(),
+					tokens[2].clone(),
+				));
 			}
 		}
 	}
