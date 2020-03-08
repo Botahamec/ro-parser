@@ -1,4 +1,3 @@
-
 use crate::TokenList;
 
 use std::collections::HashMap;
@@ -7,12 +6,11 @@ use std::collections::HashMap;
 pub struct ResultSig {
 	pub name: String,
 	pub return_type: String,
-	pub parameters: HashMap<String, String>
+	pub parameters: HashMap<String, String>,
 }
 
 pub fn parse_signature(tokens: TokenList) -> ResultSig {
-
-	let mut token : usize = 2; // the current token number
+	let mut token: usize = 2; // the current token number
 	let mut signature = ResultSig::default();
 	signature.name = tokens[0].clone();
 	while tokens[token] != ")" {

@@ -812,10 +812,7 @@ fn parse_func_test() {
 	assert_eq!(
 		parse_code(code),
 		vec![
-			CallType::Call(
-				String::from("print"),
-				string_vec(vec!["num"])
-			),
+			CallType::Call(String::from("print"), string_vec(vec!["num"])),
 			CallType::Return(String::from("void"))
 		]
 	);
@@ -823,11 +820,30 @@ fn parse_func_test() {
 
 #[test]
 fn test_sets_to_ops() {
-
 	let string_vec = |vec: Vec<&str>| -> Vec<String> {
 		vec.iter().map(|s| String::from(*s)).collect()
 	};
 
-	let mut calls : CallList = vec![CallType::Set(String::from("var1"), string_vec(vec!["var2"]))];
-	assert_eq!(sets_to_ops(calls), vec![CallType::Move(String::from("var1"), String::from("var2"))]);
+	let mut calls: CallList = vec![CallType::Set(
+		String::from("var1"),
+		string_vec(vec!["var2"]),
+	)];
+	assert_eq!(
+		sets_to_ops(calls),
+		vec![CallType::Move(String::from("var1"), String::from("var2"))]
+	);
+
+	calls = vec![CallType::Set(
+		String::from("var1"),
+		string_vec(vec!["vara", "+", "varb"]),
+	)];
+	assert_eq!(
+		sets_to_ops(calls),
+		vec![CallType::Operate(
+			String::from("var1"),
+			String::from("vara"),
+			Operation::Add,
+			String::from("varb")
+		)]
+	);
 }
