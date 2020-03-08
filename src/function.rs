@@ -58,18 +58,54 @@ pub enum CallType {
 	Operate(String, String, Operation, String),
 }
 
-pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
-	let mut token: usize = 0;
-	let mut calls: Vec<CallType> = Vec::new();
-	while token < tokens.len() {
-		if tokens[token] == "ret" {
-			token += 1;
-			calls.push(CallType::Return(tokens[token].clone()));
-		} else if tokens[token] == "var" {
-			token += 1;
-			let var_name = tokens[token].clone();
-			calls.push(CallType::Init(var_name.clone()));
-			if tokens.len() > token + 1 && tokens[token + 1] == "=" {
+impl CallType {
+	/** Creates a list of calls from a token list */
+	pub fn vec_from_tokens(tokens: TokenList) -> Vec<CallType> {
+		let mut token: usize = 0;
+		let mut calls: Vec<CallType> = Vec::new();
+		while token < tokens.len() {
+			if tokens[token] == "ret" {
+				token += 1;
+				calls.push(CallType::Return(tokens[token].clone()));
+			} else if tokens[token] == "var" {
+				token += 1;
+				let var_name = tokens[token].clone();
+				calls.push(CallType::Init(var_name.clone()));
+				if tokens.len() > token + 1 && tokens[token + 1] == "=" {
+					token += 2;
+					let mut set: TokenList = Vec::with_capacity(1);
+					set.push(tokens[token].clone());
+					/*if tokens.len() > token + 1
+						&& crate::tokenizer::OPERATORS
+							.contains(&tokens[token + 1].as_str())
+					{
+						token += 1;
+						set.push(tokens[token].clone());
+					}*/
+					while tokens.len() > token + 1
+						&& crate::tokenizer::OPERATORS
+							.contains(&tokens[token + 1].as_str())
+					{
+						token += 1;
+						if tokens.len() > token
+							&& crate::tokenizer::OPERATORS
+								.contains(&tokens[token].as_str())
+						{
+							//token += 1;
+							set.push(tokens[token].clone());
+							token += 1;
+							set.push(tokens[token].clone());
+						}
+
+						/*if tokens.len() > token + 1 {
+							token += 1;
+							set.push(tokens[token].clone());
+						}*/
+					}
+					calls.push(CallType::Set(var_name, set));
+				}
+			} else if tokens.len() > token + 1 && tokens[token + 1] == "=" {
+				let var_name = tokens[token].clone();
 				token += 2;
 				let mut set: TokenList = Vec::with_capacity(1);
 				set.push(tokens[token].clone());
@@ -101,83 +137,50 @@ pub fn parse_code(tokens: TokenList) -> Vec<CallType> {
 					}*/
 				}
 				calls.push(CallType::Set(var_name, set));
-			}
-		} else if tokens.len() > token + 1 && tokens[token + 1] == "=" {
-			let var_name = tokens[token].clone();
-			token += 2;
-			let mut set: TokenList = Vec::with_capacity(1);
-			set.push(tokens[token].clone());
-			/*if tokens.len() > token + 1
-				&& crate::tokenizer::OPERATORS
-					.contains(&tokens[token + 1].as_str())
-			{
-				token += 1;
-				set.push(tokens[token].clone());
-			}*/
-			while tokens.len() > token + 1
-				&& crate::tokenizer::OPERATORS
-					.contains(&tokens[token + 1].as_str())
-			{
-				token += 1;
-				if tokens.len() > token
-					&& crate::tokenizer::OPERATORS
-						.contains(&tokens[token].as_str())
-				{
-					//token += 1;
-					set.push(tokens[token].clone());
+			} else if tokens.len() > 1 && tokens[token + 1] == "(" {
+				let func_name = tokens[token].clone();
+				token += 2;
+				let mut parameters: Vec<String> = vec![];
+				while tokens.len() > token && tokens[token] != ")" {
+					parameters.push(tokens[token].clone());
 					token += 1;
-					set.push(tokens[token].clone());
+					if tokens[token] == "," {
+						token += 1;
+					}
 				}
 
-				/*if tokens.len() > token + 1 {
-					token += 1;
-					set.push(tokens[token].clone());
-				}*/
+				calls.push(CallType::Call(func_name, parameters));
 			}
-			calls.push(CallType::Set(var_name, set));
-		} else if tokens.len() > 1 && tokens[token + 1] == "(" {
-			let func_name = tokens[token].clone();
-			token += 2;
-			let mut parameters: Vec<String> = vec![];
-			while tokens.len() > token && tokens[token] != ")" {
-				parameters.push(tokens[token].clone());
-				token += 1;
-				if tokens[token] == "," {
-					token += 1;
+
+			token += 1;
+		}
+
+		calls
+	}
+
+	/**
+	 * Converts Set calls to Operate and Move calls
+	 */
+	pub fn sets_to_ops(calls: CallList) -> CallList {
+		let mut new_calls: CallList = vec![];
+
+		for call in calls.clone() {
+			if let CallType::Set(var, tokens) = call {
+				if tokens.len() == 1 {
+					new_calls.push(CallType::Move(var, tokens[0].clone()));
+				} else if tokens.len() == 3 {
+					new_calls.push(CallType::Operate(
+						var,
+						tokens[0].clone(),
+						Operation::from_str(tokens[1].clone()).unwrap(),
+						tokens[2].clone(),
+					));
 				}
 			}
-
-			calls.push(CallType::Call(func_name, parameters));
 		}
 
-		token += 1;
+		new_calls
 	}
-
-	calls
-}
-
-/**
- * Converts Set calls to Operate and Move calls
- */
-pub fn sets_to_ops(calls: CallList) -> CallList {
-	let mut new_calls: CallList = vec![];
-
-	for call in calls.clone() {
-		if let CallType::Set(var, tokens) = call {
-			if tokens.len() == 1 {
-				new_calls.push(CallType::Move(var, tokens[0].clone()));
-			} else if tokens.len() == 3 {
-				new_calls.push(CallType::Operate(
-					var,
-					tokens[0].clone(),
-					Operation::from_str(tokens[1].clone()).unwrap(),
-					tokens[2].clone(),
-				));
-			}
-		}
-	}
-
-	new_calls
 }
 
 impl FuncParser {
@@ -226,6 +229,10 @@ impl FuncParser {
 
 	pub fn parse_signature(self) -> FuncSig {
 		FuncSig::from_tokens(self.signature)
+	}
+
+	pub fn parse_calls(self) -> CallList {
+		CallType::sets_to_ops(CallType::vec_from_tokens(self.code))
 	}
 }
 

@@ -683,16 +683,16 @@ fn parse_func_test() {
 
 	// just a return statement
 	let mut code = string_vec(vec!["ret", "0"]);
-	assert_eq!(parse_code(code), vec![CallType::Return(String::from("0"))]);
+	assert_eq!(CallType::vec_from_tokens(code), vec![CallType::Return(String::from("0"))]);
 
 	// just initializes a variable
 	code = string_vec(vec!["var", "var1"]);
-	assert_eq!(parse_code(code), vec![CallType::Init(String::from("var1"))]);
+	assert_eq!(CallType::vec_from_tokens(code), vec![CallType::Init(String::from("var1"))]);
 
 	// sets a new var
 	code = string_vec(vec!["var", "var1", "=", "3"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![
 			CallType::Init(String::from("var1")),
 			CallType::Set(String::from("var1"), string_vec(vec!["3"]))
@@ -702,7 +702,7 @@ fn parse_func_test() {
 	// sets a new var to an operation
 	code = string_vec(vec!["var", "var1", "=", "3", "+", "2", "*", "7"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![
 			CallType::Init(String::from("var1")),
 			CallType::Set(
@@ -715,7 +715,7 @@ fn parse_func_test() {
 	// initializes a variable and returns it
 	code = string_vec(vec!["var", "num", "=", "5", "ret", "num"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![
 			CallType::Init(String::from("num")),
 			CallType::Set(String::from("num"), string_vec(vec!["5"])),
@@ -726,7 +726,7 @@ fn parse_func_test() {
 	// initializes a variable and returns it
 	code = string_vec(vec!["var", "num", "=", "5", "+", "3", "ret", "num"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![
 			CallType::Init(String::from("num")),
 			CallType::Set(String::from("num"), string_vec(vec!["5", "+", "3"])),
@@ -737,14 +737,14 @@ fn parse_func_test() {
 	// simply sets a pre-exiting var
 	code = string_vec(vec!["num", "=", "5"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![CallType::Set(String::from("num"), string_vec(vec!["5"]))]
 	);
 
 	// sets a pre-exiting var to the result of an operation
 	code = string_vec(vec!["num", "=", "5", "+", "3", "*", "7"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![CallType::Set(
 			String::from("num"),
 			string_vec(vec!["5", "+", "3", "*", "7"])
@@ -754,7 +754,7 @@ fn parse_func_test() {
 	// initializes and sets a variable
 	code = string_vec(vec!["var", "num", "num", "=", "5", "+", "3", "*", "7"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![
 			CallType::Init(String::from("num")),
 			CallType::Set(
@@ -769,7 +769,7 @@ fn parse_func_test() {
 		"var", "num", "num", "=", "5", "+", "3", "*", "7", "ret", "num",
 	]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![
 			CallType::Init(String::from("num")),
 			CallType::Set(
@@ -783,14 +783,14 @@ fn parse_func_test() {
 	// parameter-less function call
 	code = string_vec(vec!["print", "(", ")"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![CallType::Call(String::from("print"), vec![])]
 	);
 
 	// parameter function call
 	code = string_vec(vec!["print", "(", "num", ")"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![CallType::Call(
 			String::from("print"),
 			string_vec(vec!["num"])
@@ -800,7 +800,7 @@ fn parse_func_test() {
 	// parameters function call
 	code = string_vec(vec!["print", "(", "num", ",", "vart", ")"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![CallType::Call(
 			String::from("print"),
 			string_vec(vec!["num", "vart"])
@@ -810,7 +810,7 @@ fn parse_func_test() {
 	// return after print
 	code = string_vec(vec!["print", "(", "num", ")", "ret", "void"]);
 	assert_eq!(
-		parse_code(code),
+		CallType::vec_from_tokens(code),
 		vec![
 			CallType::Call(String::from("print"), string_vec(vec!["num"])),
 			CallType::Return(String::from("void"))
@@ -829,7 +829,7 @@ fn test_sets_to_ops() {
 		string_vec(vec!["var2"]),
 	)];
 	assert_eq!(
-		sets_to_ops(calls),
+		CallType::sets_to_ops(calls),
 		vec![CallType::Move(String::from("var1"), String::from("var2"))]
 	);
 
@@ -838,7 +838,7 @@ fn test_sets_to_ops() {
 		string_vec(vec!["vara", "+", "varb"]),
 	)];
 	assert_eq!(
-		sets_to_ops(calls),
+		CallType::sets_to_ops(calls),
 		vec![CallType::Operate(
 			String::from("var1"),
 			String::from("vara"),
