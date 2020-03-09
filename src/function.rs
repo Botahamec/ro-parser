@@ -18,6 +18,12 @@ pub struct FuncSig {
 	pub result: Option<String>,
 }
 
+#[derive(Clone, Default, Debug, PartialEq)]
+pub struct Function {
+	signature: FuncSig,
+	calls: CallList,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Operation {
 	Add,
@@ -227,12 +233,12 @@ impl FuncParser {
 		Self::vec_from_tokens(tokens)
 	}
 
-	pub fn parse_signature(self) -> FuncSig {
-		FuncSig::from_tokens(self.signature)
+	pub fn parse_signature(&self) -> FuncSig {
+		FuncSig::from_tokens(self.signature.clone())
 	}
 
-	pub fn parse_calls(self) -> CallList {
-		CallType::sets_to_ops(CallType::vec_from_tokens(self.code))
+	pub fn parse_calls(&self) -> CallList {
+		CallType::sets_to_ops(CallType::vec_from_tokens(self.code.clone()))
 	}
 }
 
@@ -306,5 +312,19 @@ impl FuncSig {
 
 	pub fn from_func_parser(parser: FuncParser) -> Self {
 		parser.parse_signature()
+	}
+}
+
+impl Function {
+	/** creates a new function */
+	pub fn new(signature: FuncSig, calls: CallList) -> Self {
+		Function { signature, calls }
+	}
+
+	/** converts a FuncParser to a Function */
+	pub fn from_parser(parser: FuncParser) -> Self {
+		let signature = parser.parse_signature();
+		let calls = parser.parse_calls();
+		Function { signature, calls }
 	}
 }

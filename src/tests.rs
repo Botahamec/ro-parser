@@ -683,11 +683,17 @@ fn parse_func_test() {
 
 	// just a return statement
 	let mut code = string_vec(vec!["ret", "0"]);
-	assert_eq!(CallType::vec_from_tokens(code), vec![CallType::Return(String::from("0"))]);
+	assert_eq!(
+		CallType::vec_from_tokens(code),
+		vec![CallType::Return(String::from("0"))]
+	);
 
 	// just initializes a variable
 	code = string_vec(vec!["var", "var1"]);
-	assert_eq!(CallType::vec_from_tokens(code), vec![CallType::Init(String::from("var1"))]);
+	assert_eq!(
+		CallType::vec_from_tokens(code),
+		vec![CallType::Init(String::from("var1"))]
+	);
 
 	// sets a new var
 	code = string_vec(vec!["var", "var1", "=", "3"]);
