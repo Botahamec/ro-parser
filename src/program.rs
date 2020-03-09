@@ -91,6 +91,32 @@ impl ProgramParser {
 		program_parser
 	}
 
+	/** Yes, this function is too complicated. I'm sorry
+	 * This moves functions into their respective results
+	 */
+	pub fn move_funcs(&mut self) {
+		for i in 0..self.functions.len() {
+			let functions: &mut Vec<FuncParser> = self.functions.as_mut();
+			let results: &mut Vec<ResultParser> = self.results.as_mut();
+			let func = functions.get(i).unwrap().clone();
+			if let Some(r) = func.parse_signature().result {
+				functions.remove(i);
+				let results0 = results.clone();
+				results
+					.get_mut(
+						results0
+							.clone()
+							.iter()
+							.position(|x| x.parse_signature().name == r)
+							.unwrap(),
+					)
+					.unwrap()
+					.functions
+					.push(func.clone());
+			}
+		}
+	}
+
 	/** Creates a list of functions */
 	pub fn parse_funcs(&self) -> Vec<Function> {
 		let mut funcs = Vec::with_capacity(self.functions.len());
@@ -101,8 +127,8 @@ impl ProgramParser {
 	}
 
 	/** Creates a list of results */
-	// TODO: put some functions into results
-	pub fn parse_results(&self) -> Vec<RoResult> {
+	pub fn parse_results(&mut self) -> Vec<RoResult> {
+		self.move_funcs();
 		let mut results = Vec::with_capacity(self.results.len());
 		for result in self.results.clone() {
 			results.push(result.parse());
@@ -111,7 +137,7 @@ impl ProgramParser {
 	}
 
 	/** Creates a Program */
-	pub fn parse(&self) -> Program {
+	pub fn parse(&mut self) -> Program {
 		Program {
 			functions: self.parse_funcs(),
 			results: self.parse_results(),
