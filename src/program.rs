@@ -1,12 +1,19 @@
 use crate::function::FuncParser;
 use crate::function::Function;
 use crate::result::ResultParser;
+use crate::result::RoResult;
 use crate::tokenizer::TokenList;
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ProgramParser {
 	pub results: Vec<ResultParser>,
 	pub functions: Vec<FuncParser>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Program {
+	pub results: Vec<RoResult>,
+	pub functions: Vec<Function>,
 }
 
 impl ProgramParser {
@@ -91,5 +98,23 @@ impl ProgramParser {
 			funcs.push(func.parse());
 		}
 		funcs
+	}
+
+	/** Creates a list of results */
+	// TODO: put some functions into results
+	pub fn parse_results(&self) -> Vec<RoResult> {
+		let mut results = Vec::with_capacity(self.results.len());
+		for result in self.results.clone() {
+			results.push(result.parse());
+		}
+		results
+	}
+
+	/** Creates a Program */
+	pub fn parse(&self) -> Program {
+		Program {
+			functions: self.parse_funcs(),
+			results: self.parse_results(),
+		}
 	}
 }
