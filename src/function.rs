@@ -240,6 +240,10 @@ impl FuncParser {
 	pub fn parse_calls(&self) -> CallList {
 		CallType::sets_to_ops(CallType::vec_from_tokens(self.code.clone()))
 	}
+
+	pub fn parse(self) -> Function {
+		Function::from_parser(self)
+	}
 }
 
 impl FuncSig {

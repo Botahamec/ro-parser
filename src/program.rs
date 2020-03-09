@@ -1,4 +1,5 @@
 use crate::function::FuncParser;
+use crate::function::Function;
 use crate::result::ResultParser;
 use crate::tokenizer::TokenList;
 
@@ -81,5 +82,14 @@ impl ProgramParser {
 			token += 1;
 		}
 		program_parser
+	}
+
+	/** Creates a list of functions */
+	pub fn parse_funcs(&self) -> Vec<Function> {
+		let mut funcs = Vec::with_capacity(self.functions.len());
+		for func in self.functions.clone() {
+			funcs.push(func.parse());
+		}
+		funcs
 	}
 }
