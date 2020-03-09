@@ -1,4 +1,5 @@
 use crate::function::FuncParser;
+use crate::function::Function;
 use crate::tokenizer::TokenList;
 
 use std::collections::HashMap;
@@ -9,11 +10,17 @@ pub struct ResultParser {
 	pub functions: Vec<FuncParser>,
 }
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct ResultSig {
 	pub name: String,
 	pub return_type: Option<String>,
 	pub parameters: HashMap<String, String>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct RoResult {
+	signature: ResultSig,
+	functions: Vec<Function>,
 }
 
 impl ResultParser {
@@ -22,6 +29,23 @@ impl ResultParser {
 	 */
 	pub fn parse_signature(&self) -> ResultSig {
 		ResultSig::from_tokens(self.signature.clone())
+	}
+
+	/** Creates a list of functions */
+	pub fn parse_funcs(&self) -> Vec<Function> {
+		let mut funcs = Vec::with_capacity(self.functions.len());
+		for func in self.functions.clone() {
+			funcs.push(func.parse());
+		}
+		funcs
+	}
+
+	/** Converts to a RoResult */
+	pub fn parse(&self) -> RoResult {
+		RoResult {
+			signature: self.parse_signature(),
+			functions: self.parse_funcs(),
+		}
 	}
 }
 
