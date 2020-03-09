@@ -15,4 +15,6 @@ mod tests;
 mod benches;
 
 // the main function
-//fn parse(code: String) -> Program {tokenize(code)}
+pub fn parse(code: String) -> program::Program {
+	program::ProgramParser::from_tokens(tokenizer::tokenize(code)).parse()
+}
